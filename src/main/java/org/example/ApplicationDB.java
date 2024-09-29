@@ -18,23 +18,29 @@ public class ApplicationDB {
                 statement.execute(sql);
                 statement.close(); // В конце закрываем
             }
-            var sql2 = "INSERT INTO users (username, phone) VALUES ('tommy', '123456789')";
-            var statement2 = conn.createStatement();
-            statement2.executeUpdate(sql2);
-            statement2.close();
+            var sql2 = "INSERT INTO users (username, phone) VALUES (?, ?)";
+            try (var statement2 = conn.prepareStatement(sql2)) {
+                statement2.setString(1, "Tommy");
+                statement2.setString(2, "33333333");
+                statement2.executeUpdate();
 
-            var sql3 = "SELECT * FROM users";
-            var statement3 = conn.createStatement();
-            // Здесь вы видите указатель на набор данных в памяти СУБД
-            var resultSet = statement3.executeQuery(sql3);
-            // Набор данных — это итератор
-            // Мы перемещаемся по нему с помощью next() и каждый раз получаем новые значения
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("username"));
-                System.out.println(resultSet.getString("phone"));
+                statement2.setString(1, "Maria");
+                statement2.setString(2, "44444444");
+                statement2.executeUpdate();
             }
-            statement3.close();
+            var sql3 = "SELECT * FROM users";
 
+            try (var statement3 = conn.createStatement()) {
+                // Здесь вы видите указатель на набор данных в памяти СУБД
+                var resultSet = statement3.executeQuery(sql3);
+                // Набор данных — это итератор
+                // Мы перемещаемся по нему с помощью next() и каждый раз получаем новые значения
+                while (resultSet.next()) {
+                    System.out.println(resultSet.getString("username"));
+                    System.out.println(resultSet.getString("phone"));
+                }
+                statement3.close();
+            }
             // Закрываем соединение
             conn.close();
         }
